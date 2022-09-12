@@ -7,23 +7,6 @@ from tensorflow.keras.models import Model
 from tensorflow.keras import regularizers
 
 
-class TopKDense(layers.Dense):
-    def __init__(self, units, k=10, **kwargs):
-        super().__init__(units, **kwargs)
-        self.k = k
-        
-    def call(self, inputs):
-        xw = inputs[:,None,:] * tf.transpose(self.weights[0])
-        topk = tf.math.top_k(xw, k=self.k).values
-        scores = tf.math.reduce_sum(topk, axis=2) + self.weights[1]
-        return self.activation(scores)
-    
-    def get_config(self):
-        config = super().get_config()
-        config.update({"k": self.k})
-        return config
-
-
 class TopKConv(layers.DepthwiseConv2D):
     def __init__(self, kernel_size, filter_shape, k=10, **kwargs):
         super().__init__(kernel_size, **kwargs)
